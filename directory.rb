@@ -5,10 +5,27 @@ def input_students
   students = []
   name = gets.chomp
 
+  puts "What cohort are they in?"
+  cohort = gets.chomp
+
   while !name.empty? do
-    students << {name: name, cohort: :november}
-    puts "Now we have #{students.count} students"
+    students << {name: name, cohort: cohort}
+    if students.count == 1
+      puts "Now we have #{students.count} student"
+    else
+      puts "Now we have #{students.count} students"
+    end
+    
+    puts "What is the next students name?"
     name = gets.chomp
+    puts "What cohort are they in?"
+    cohort = gets.chomp
+
+    if cohort.length == 0
+      cohort = "default"
+    end
+
+    cohort.to_sym
   end
 
   students
@@ -20,8 +37,27 @@ def print_header
 end
 
 def print(students)
-  students.each do |student|
-    puts "#{student[:name]} (#{student[:cohort]} cohort)"
+  counter = 0
+  while students.length > counter
+    puts "#{students[counter][:name]} (#{students[counter][:cohort]} cohort)"
+    counter +=1
+  end
+end
+
+def print_by_cohort(students)
+  cohort_list = students.map do |student|
+    student[:cohort]
+  end
+  cohort_list = cohort_list.uniq
+
+  counter = 0
+  while counter < cohort_list.length
+    students.each do |student|
+      if student[:cohort] == cohort_list[counter]
+        puts "#{student[:name]} (#{student[:cohort]} cohort)"
+      end
+    end
+  counter += 1
   end
 end
 
@@ -31,5 +67,5 @@ end
 
 students = input_students
 print_header
-print(students)
 print_footer(students)
+print_by_cohort(students)

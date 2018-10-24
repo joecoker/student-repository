@@ -4,13 +4,13 @@ def input_students
   puts "Please enter the names of the students"
   puts "To Finish, just hit return twice"
 
-  name = gets.chomp
+  name = STDIN.gets.chomp
 
   puts "What cohort are they in?"
-  cohort = gets.chomp
+  cohort = STDIN.gets.chomp
 
   while !name.empty? do
-    @students << {name: name, cohort: cohort}
+    add_to_students(name, cohort)
     if @students.count == 1
       puts "Now we have #{@students.count} student"
     else
@@ -18,15 +18,28 @@ def input_students
     end
 
     puts "What is the next students name?"
-    name = gets.chomp
+    name = STDIN.gets.chomp
     puts "What cohort are they in?"
-    cohort = gets.chomp
+    cohort = STDIN.gets.chomp
 
     if cohort.length == 0
       cohort = "default"
     end
     cohort.to_sym
   end
+end
+
+def load_students(filename = "students.csv")
+  file = File.open(filename, "r")
+  file.readlines.each do |line|
+    name, cohort = line.chomp.split(',')
+    add_to_students(name, cohort)
+  end
+  file.close
+end
+
+def add_to_students(name, cohort)
+  @students << {name: name, cohort: cohort.to_sym}
 end
 
 def print_header
@@ -67,7 +80,7 @@ def interactive_menu
   students = []
   loop do
     print_menu
-    process(gets.chomp)
+    process(STDIN.gets.chomp)
   end
 end
 
@@ -113,13 +126,17 @@ def save_students
   file.close
 end
 
-def load_students
-  file = File.open("students.csv", "r")
-  file.readlines.each do |line|
-    name, cohort = line.chomp.split(',')
-    @students << {name: name, cohort: cohort.to_sym}
+def try_load_students
+  filename = ARGV.first
+  return if filename.nil?
+  if File.exists?(filename)
+    load_students(filename)
+    puts "Loaded #{@students.count} from #{filename}"
+  else
+    puts "Sorry, #{filename} doesn't exist."
+    exit
   end
-  file.close
 end
 
+try_load_students
 interactive_menu

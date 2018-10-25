@@ -95,7 +95,7 @@ def process(selection)
   when "3"
     save_students
   when "4"
-    load_students
+    load_students(ARGV.first)
   when "9"
     exit
   else
@@ -106,15 +106,17 @@ end
 def save_students
   puts "What is the filename?"
   file_name = gets.chomp
-  file = File.open(file_name, "w")
-  @students.each do |student|
+
+  CSV.open(file_name, "w") do |file|
+    @students.each do |student|
     student_data = [student[:name], student[:cohort]]
     csv_line = student_data.join(",")
     file.puts csv_line
   end
-  file.close
+end
   puts "Students saved"
 end
+
 
 def try_load_students
   filename = ARGV.first
@@ -130,13 +132,15 @@ def load_students(filename)
     puts "What is the filename?"
     filename = gets.chomp
   end
-  file = File.open(filename, "r")
-  file.readlines.each do |line|
-    name, cohort = line.chomp.split(',')
-    add_to_students(name, cohort)
+  CSV.open(filename, "r") do |file|
+    file.each do |line|
+      name, cohort = line.chomp.split(',')
+      add_to_students(name, cohort)
+    end
   end
-  file.close
 end
+
+
 
 try_load_students
 interactive_menu
